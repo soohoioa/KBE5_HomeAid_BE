@@ -7,10 +7,9 @@ import com.homeaid.exception.CustomException;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.CustomerRepository;
 import com.homeaid.user.dto.request.AdminCustomerSearchRequestDto;
+import com.homeaid.user.dto.response.CustomerDetailResponseDto;
 import com.homeaid.user.repository.AdminCustomerRepository;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -53,7 +52,7 @@ public class AdminCustomerServiceImpl implements AdminCustomerService {
 
   @Transactional(readOnly = true)
   @Override
-  public Map<String, Object> getCustomerDetail(Long userId) {
+  public CustomerDetailResponseDto getCustomerDetail(Long userId) {
     Customer customer = customerRepository.findById(userId)
         .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
@@ -62,10 +61,11 @@ public class AdminCustomerServiceImpl implements AdminCustomerService {
         .map(CustomerAddressResponseDto::toDto)
         .toList();
 
-    Map<String, Object> result = new HashMap<>();
-    result.put("profile", profileDto);
-    result.put("addresses", addressDtoList);
-    return result;
+    return CustomerDetailResponseDto.builder()
+        .profile(profileDto)
+        .addresses(addressDtoList)
+        .build();
   }
+
 
 }

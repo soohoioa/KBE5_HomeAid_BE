@@ -117,20 +117,37 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
   @Override
   @Transactional(readOnly = true)
   public InquiryWithReplyResponseDto getBoardWithReply(Long boardId) {
-    UserBoard board = userBoardRepository.findById(boardId)
-        .orElseThrow(() -> new CustomException(BoardErrorCode.BOARD_NOT_FOUND));
-
-    BoardReply reply = adminBoardReplyRepository.findByBoardId(boardId).orElse(null);
+    UserBoard board = findBoardOrThrow(boardId);
+    BoardReply reply = findReplyOrNull(boardId);
 
     UserBoardListResponseDto boardDto = UserBoardListResponseDto.toDto(board);
-    InquiryDetailResponseDto replyDto = (reply != null)
-        ? InquiryDetailResponseDto.from(reply, reply.getUser() != null ? reply.getUser().getName() : null)
-        : null;
+    InquiryDetailResponseDto replyDto = convertReplyToDto(reply);
 
     return InquiryWithReplyResponseDto.builder()
         .board(boardDto)
         .reply(replyDto)
         .build();
+  }
+
+  private UserBoard findBoardOrThrow(Long boardId) {
+    return userBoardRepository.findById(boardId)
+        .orElseThrow(() -> new CustomException(BoardErrorCode.BOARD_NOT_FOUND));
+  }
+
+  private BoardReply findReplyOrNull(Long boardId) {
+    return adminBoardReplyRepository.findByBoardId(boardId).orElse(null);
+  }
+
+  private InquiryDetailResponseDto convertReplyToDto(BoardReply reply) {
+    if (reply == null) {
+      return null;
+    }
+
+    String replyUserName = null;
+    if (reply.getUser() != null) {
+      replyUserName = reply.getUser().getName();
+    }
+    return InquiryDetailResponseDto.from(reply, replyUserName);
   }
 
   // 유효성 검사

@@ -5,6 +5,7 @@ import com.homeaid.common.response.PagedResponseDto;
 import com.homeaid.domain.Customer;
 import com.homeaid.dto.request.CustomerResponseDto;
 import com.homeaid.user.dto.request.AdminCustomerSearchRequestDto;
+import com.homeaid.user.dto.response.CustomerDetailResponseDto;
 import com.homeaid.user.service.AdminCustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,7 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -65,9 +65,9 @@ public class AdminCustomerController {
   @GetMapping("/{userId}")
   @Operation(summary = "회원 상세조회", description = "특정 회원의 프로필 및 주소 목록을 통합 조회합니다.")
   @RolesAllowed("ADMIN")
-  public ResponseEntity<CommonApiResponse<Map<String, Object>>> getCustomerDetail(
+  public ResponseEntity<CommonApiResponse<CustomerDetailResponseDto>> getCustomerDetail(
       @PathVariable Long userId) {
-    Map<String, Object> dtoMap = adminCustomerService.getCustomerDetail(userId);
-    return ResponseEntity.ok(CommonApiResponse.success(dtoMap));
+    CustomerDetailResponseDto detailDto = adminCustomerService.getCustomerDetail(userId);
+    return ResponseEntity.ok(CommonApiResponse.success(detailDto));
   }
 }
